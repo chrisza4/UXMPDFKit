@@ -9,6 +9,11 @@
 import UIKit
 import SafariServices
 
+public protocol PDFViewControllerDelegate {
+  func onDismiss () -> Void
+  func onShowThumbnailView () -> Void
+}
+
 open class PDFViewController: UIViewController {
     
     /// A boolean value that determines whether the navigation bar and scrubber bar hide on screen tap
@@ -20,7 +25,9 @@ open class PDFViewController: UIViewController {
             pageScrubber.isHidden = !showsScrubber
         }
     }
-    
+  
+    open var delegate: PDFViewControllerDelegate? = nil
+  
     /// A boolean value that determines if a PDF should have fillable form elements
     open var allowsFormFilling: Bool = true
     
@@ -246,6 +253,7 @@ open class PDFViewController: UIViewController {
         vc.delegate = self
         let nvc = UINavigationController(rootViewController: vc)
         nvc.modalTransitionStyle = .crossDissolve
+        self.delegate?.onShowThumbnailView()
         present(nvc, animated: true, completion: nil)
     }
     
@@ -281,7 +289,9 @@ open class PDFViewController: UIViewController {
     }
     
     func dismissModal() {
-        dismiss(animated: true, completion: nil)
+      dismiss(animated: true, completion:{
+        self.delegate?.onDismiss()
+      })
     }
 }
 
