@@ -204,7 +204,7 @@ open class PDFAnnotationController: UIViewController {
         guard let touch = touches.first else { return }
         
         let page = annotationDelegate?.annotationWillStart(touch: touch)
-        
+        var point = touch.location(in: pageView)
         // Do not add an annotation unless it is a new one
         // IMPORTANT
         if currentAnnotation == nil {
@@ -214,11 +214,38 @@ open class PDFAnnotationController: UIViewController {
                 
                 pageView?.addSubview(currentAnnotation.mutableView())
             }
+            point = touch.location(in: pageView)
+        } else if (annotationType == PDFAnnotationType.text) {
+            point = handleTouchForTextAnnotation(touch, page: page)
         }
-        
-        
-        let point = touch.location(in: pageView)
+    
         currentAnnotation?.touchStarted(touch, point: point)
+    }
+    
+    private func handleTouchForTextAnnotation (_ touch: UITouch, page: Int?) -> CGPoint {
+        // In text mode, we can switch current annotation
+        var touchOnOldAnnotations = false
+        var point = touch.location(in: pageView)
+        let allAnnotations = annotations.annotations + [ currentAnnotation! ]
+        for annotation in allAnnotations {
+            guard let annotation = annotation as? PDFTextAnnotation else { continue }
+            if annotation.rect.contains(point) {
+                addCurrentAnnotationToStore()
+                currentAnnotation = annotation
+                touchOnOldAnnotations = true
+                break
+            }
+        }
+        if (!touchOnOldAnnotations) {
+            addCurrentAnnotationToStore()
+            createNewAnnotation()
+            currentAnnotation?.page = page
+            if let currentAnnotation = currentAnnotation {
+                pageView?.addSubview(currentAnnotation.mutableView())
+            }
+            point = touch.location(in: pageView)
+        }
+        return point
     }
     
     open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
