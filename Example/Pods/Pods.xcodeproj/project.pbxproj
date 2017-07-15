@@ -334,6 +334,7 @@
 				5A90FE0DFE2EBD8FE99BC387BEBFF1BC /* Products */,
 				546BB7A2873A587864100A030E28B105 /* Targets Support Files */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
 		};
 		81336BCA9643382D6508CC16CB35EE81 /* Model */ = {

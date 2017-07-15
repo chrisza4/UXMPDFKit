@@ -99,7 +99,7 @@ extension PDFTextAnnotation: PDFAnnotation {
     }
     
     func touchEnded(_ touch: UITouch, point: CGPoint) {
-        if startTouch == point {
+        if startTouch == point && self.rect.contains(point) {
             textView.becomeFirstResponder()
         }
         isDragging = false
